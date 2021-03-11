@@ -19,3 +19,7 @@ This script will fetch the documentation from the Swift homepage, build the Dash
 ## Links
 
 - [GitHub repository](https://github.com/roeybiran/dash-docset-swift-5.3-language-guide)
+
+## Issues
+
+- The "On This Page" jump menu as originally seen in the Swift website has been hidden due to some visual glitches it was causing. The Dash table of contents should offer a similar functionality.
