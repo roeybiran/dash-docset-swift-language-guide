@@ -101,6 +101,10 @@ for page in glob(f"{html_pages}/*"):
     fp = open(page, "r+")
     soup = BeautifulSoup(fp, "lxml")
 
+    #
+    menu = soup.find(id="jump_to")
+    menu["style"] = "visibility: hidden;"
+    #
     for div in soup.find_all("div", "section"):
         # an h1, h2, h3 or h4, containg text and an <a> tag
         first_child = div.contents[1]
@@ -109,21 +113,21 @@ for page in glob(f"{html_pages}/*"):
         dash_entry_type = "Guide"
         dash_name = first_child.contents[0]
 
-        # anchor = first_child.contents[1]["href"]
-        # # make the *.html paths relative
-        # dash_path = re.sub(r"^.+?Resources/Documents/", "", page)
-        # dash_path = dash_path + anchor
-        # dash_anchor_node = soup.new_tag("a")
-        # dash_anchor_node["name"] = "//apple_ref/cpp/{}/{}".format(
-        #     dash_entry_type, dash_name
-        # )
-        # dash_anchor_node["class"] = "dashAnchor"
-        # div.insert(0, dash_anchor_node)
+        anchor = first_child.contents[1]["href"]
+        # make the *.html paths relative
+        dash_path = re.sub(r"^.+?Resources/Documents/", "", page)
+        dash_path = dash_path + anchor
+        dash_anchor_node = soup.new_tag("a")
+        dash_anchor_node["name"] = "//apple_ref/cpp/{}/{}".format(
+            dash_entry_type, dash_name
+        )
+        dash_anchor_node["class"] = "dashAnchor"
+        div.insert(0, dash_anchor_node)
 
-        # cursor.execute(
-        #     "INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);",
-        #     (dash_name, dash_entry_type, dash_path),
-        # )
+        cursor.execute(
+            "INSERT OR IGNORE INTO searchIndex(name, type, path) VALUES (?, ?, ?);",
+            (dash_name, dash_entry_type, dash_path),
+        )
 
     fp.seek(0)
     fp.truncate()
