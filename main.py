@@ -5,6 +5,7 @@
 # https://github.com/Kapeli/Dash-User-Contributions#contribute-a-new-docset
 # https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 
+import subprocess
 import sys
 import os
 import shutil
@@ -19,19 +20,19 @@ from bs4 import BeautifulSoup
 html_bundle_name = "docs.swift.org"
 build_dir = ".build"
 docset_file_name = "Swift.docset"
-
-# docs_src = f"{src_dir}/{html_bundle_name}"
 assets_dir = "assets"
-plist_path = f"{build_dir}/{docset_file_name}/Contents/Info.plist"
-db_path = f"{build_dir}/{docset_file_name}/Contents/Resources/docSet.dsidx"
 json_path = f"{build_dir}/docset.json"
-docs_dirname = f"{build_dir}/{docset_file_name}/Contents/Resources/Documents"
-docs_path = f"{docs_dirname}/{html_bundle_name}"
-html_pages = f"{docs_path}/swift-book/LanguageGuide"
+docset_path = f"{build_dir}/{docset_file_name}"
+tar_path = f"{build_dir}/Swift.tgz"
+plist_path = f"{docset_path}/Contents/Info.plist"
+db_path = f"{docset_path}/Contents/Resources/docSet.dsidx"
+docs_dirname = f"{docset_path}/Contents/Resources/Documents"
+html_path = f"{docs_dirname}/{html_bundle_name}"
+html_pages = f"{html_path}/swift-book/LanguageGuide"
 
 json_obj = {
     "name": "Swift Language Guide",
-    "version": "5.3",
+    "version": "5.4",
     "archive": "Swift.tgz",
     "author": {"name": "Roey Biran", "link": "https://github.com/roeybiran"},
     "aliases": ["Swift", "Swift Language Guide", "Swift Book"],
@@ -44,7 +45,7 @@ json_obj = {
 
 plist_obj = {
     "CFBundleIdentifier": "com.roeybiran.dashdocset.SwiftLanguageGuide",
-    "CFBundleName": "Swift 5.3 Language Guide",
+    "CFBundleName": "Swift 5.4 Language Guide",
     "DocSetPlatformFamily": "Swift",
     "isDashDocset": True,
     "dashIndexFilePath": "docs.swift.org/swift-book/LanguageGuide/TheBasics.html",
@@ -75,7 +76,7 @@ shutil.copy(f"{assets_dir}/icon.png", build_dir)
 shutil.copy(f"{assets_dir}/icon@2x.png", build_dir)
 
 fp = open(json_path, "w+")
-json.dump(json_obj, fp)
+json.dump(json_obj, fp, indent=2)
 fp.close()
 
 fp = open(plist_path, "wb")
@@ -110,7 +111,12 @@ for page in glob(f"{html_pages}/*"):
         first_child = div.contents[1]
         first_child_tag = first_child.name
 
-        dash_entry_type = "Guide"
+        if first_child_tag == "h1":
+            dash_entry_type = "Guide"
+        elif first_child_tag == "h2":
+            dash_entry_type == "Section"
+        else:
+            dash_entry_type = "Entry"
         dash_name = first_child.contents[0]
 
         anchor = first_child.contents[1]["href"]
@@ -136,3 +142,6 @@ for page in glob(f"{html_pages}/*"):
 
 connection.commit()
 connection.close()
+
+subprocess.check_output(["/usr/bin/tar", "--exclude='.DS_Store'", "-cvzf", tar_path, docset_path
+                         ])
