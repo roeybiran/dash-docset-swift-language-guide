@@ -109,12 +109,11 @@ for page in glob(f"{html_pages}/*"):
     for div in soup.find_all("div", "section"):
         # an h1, h2, h3 or h4, containg text and an <a> tag
         first_child = div.contents[1]
-        first_child_tag = first_child.name
 
-        if first_child_tag == "h1":
+        if first_child.name == "h1":
             dash_entry_type = "Guide"
-        elif first_child_tag == "h2":
-            dash_entry_type == "Section"
+        elif first_child.name == "h2":
+            dash_entry_type = "Section"
         else:
             dash_entry_type = "Entry"
         dash_name = first_child.contents[0]
