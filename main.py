@@ -16,19 +16,30 @@ import re
 from subprocess import check_output
 from glob import glob
 from bs4 import BeautifulSoup
+from os.path import join
 
 html_bundle_name = "docs.swift.org"
-build_dir = ".build"
 docset_file_name = "Swift.docset"
 assets_dir = "assets"
-json_path = f"{build_dir}/docset.json"
-docset_path = f"{build_dir}/{docset_file_name}"
-tar_path = f"{build_dir}/Swift.tgz"
-plist_path = f"{docset_path}/Contents/Info.plist"
-db_path = f"{docset_path}/Contents/Resources/docSet.dsidx"
-docs_dirname = f"{docset_path}/Contents/Resources/Documents"
-html_path = f"{docs_dirname}/{html_bundle_name}"
-html_pages = f"{html_path}/swift-book/LanguageGuide"
+build_dir = ".build"
+cache_dir = ".cache"
+
+# cache
+docs_cache_path_src = join(cache_dir, html_bundle_name)
+
+# build
+docset_path = join(build_dir, docset_file_name)
+docset_plist_path = join(docset_path, "Contents/Info.plist")
+docset_db_path = join(docset_path, "Contents/Resources/docSet.dsidx")
+docs_dirname = join(docset_path, "Contents/Resources/Documents")
+docs_path = join(docs_dirname, html_bundle_name)
+html_pages = join(docs_path, "swift-book/LanguageGuide")
+
+json_path = join(build_dir, "docset.json")
+tar_path = join(build_dir, "Swift.tgz")
+icon = join(assets_dir, "icon.png")
+icon2x = join(assets_dir, "icon@2x.png")
+readme = "README.md"
 
 json_obj = {
     "name": "Swift Language Guide",
@@ -54,41 +65,45 @@ plist_obj = {
     "DashDocSetFamily": "dashtoc",
 }
 
-#
-
+os.makedirs(cache_dir, exist_ok=True)
 shutil.rmtree(build_dir, ignore_errors=True)
 os.makedirs(os.path.dirname(docs_dirname))
 
-check_output(
-    [
-        "/usr/local/bin/wget",
-        "--show-progress",
-        "--recursive",
-        "--page-requisites",
-        "--no-parent",
-        "--directory-prefix",
-        docs_dirname,
-        "https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html",
-    ]
-)
-
-shutil.copy(f"{assets_dir}/icon.png", build_dir)
-shutil.copy(f"{assets_dir}/icon@2x.png", build_dir)
-
+# copy assets
+shutil.copy(icon, build_dir)
+shutil.copy(icon2x, build_dir)
+shutil.copy(readme, build_dir)
 fp = open(json_path, "w+")
 json.dump(json_obj, fp, indent=2)
 fp.close()
 
-fp = open(plist_path, "wb")
+if not os.path.exists(docs_cache_path_src):
+    check_output(
+        [
+            "/usr/local/bin/wget",
+            "--show-progress",
+            "--recursive",
+            "--page-requisites",
+            "--no-parent",
+            "--directory-prefix",
+            cache_dir,
+            "https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html",
+        ]
+    )
+
+shutil.copytree(docs_cache_path_src, docs_path)
+
+fp = open(docset_plist_path, "wb")
 plistlib.dump(plist_obj, fp)
 fp.close()
 
 try:
-    os.unlink(db_path)
+    os.unlink(docset_db_path)
 except:
     pass
 
-connection = sqlite3.connect(db_path)
+connection = sqlite3.connect(docset_db_path)
+
 cursor = connection.cursor()
 cursor.execute(
     "CREATE TABLE IF NOT EXISTS searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);"
@@ -96,7 +111,6 @@ cursor.execute(
 cursor.execute(
     "CREATE UNIQUE INDEX IF NOT EXISTS anchor ON searchIndex (name, type, path);"
 )
-
 
 for page in glob(f"{html_pages}/*"):
     fp = open(page, "r+")
@@ -144,3 +158,11 @@ connection.close()
 
 subprocess.check_output(["/usr/bin/tar", "--exclude='.DS_Store'", "-cvzf", tar_path, docset_path
                          ])
+
+os.rename(docset_path, os.path.join(
+    os.path.dirname(docset_path), "FOR_TESTING.docset"))
+os.makedirs(join(build_dir, "Swift"))
+for file in glob(join(build_dir, "*")):
+    if "FOR_TESTING" in file:
+        continue
+    shutil.move(file, join(build_dir, "Swift"))
