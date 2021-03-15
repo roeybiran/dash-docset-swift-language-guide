@@ -20,9 +20,11 @@ from os.path import join
 
 html_bundle_name = "docs.swift.org"
 docset_file_name = "Swift.docset"
+tar_name = "Swift.tgz"
 assets_dir = "assets"
 build_dir = ".build"
 cache_dir = ".cache"
+html_parser = "html5lib"
 
 # cache
 docs_cache_path_src = join(cache_dir, html_bundle_name)
@@ -114,12 +116,8 @@ cursor.execute(
 
 for page in glob(f"{html_pages}/*"):
     fp = open(page, "r+")
-    soup = BeautifulSoup(fp, "lxml")
+    soup = BeautifulSoup(fp, html_parser)
 
-    #
-    menu = soup.find(id="jump_to")
-    menu["style"] = "visibility: hidden;"
-    #
     for div in soup.find_all("div", "section"):
         # an h1, h2, h3 or h4, containg text and an <a> tag
         first_child = div.contents[1]
@@ -156,8 +154,11 @@ for page in glob(f"{html_pages}/*"):
 connection.commit()
 connection.close()
 
-subprocess.check_output(["/usr/bin/tar", "--exclude='.DS_Store'", "-cvzf", tar_path, docset_path
-                         ])
+current_dir = os.getcwd()
+os.chdir(build_dir)
+subprocess.check_output(
+    ["/usr/bin/tar", "--exclude='.DS_Store'", "-cvzf", tar_name, docset_file_name])
+os.chdir(current_dir)
 
 os.rename(docset_path, os.path.join(
     os.path.dirname(docset_path), "FOR_TESTING.docset"))
