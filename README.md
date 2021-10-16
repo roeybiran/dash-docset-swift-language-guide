@@ -1,19 +1,14 @@
 # dash-docset-swift-language-guide
 
-Applicable to: **Swift 5.4**
+Applicable to Swift version **5.5**.
 
-[Dash docset](https://github.com/Kapeli/Dash-User-Contributions) generation script for the [Swift Language Guide](https://docs.swift.org/swift-book/LanguageGuide/).
+A Bash script to generate a [Dash docset](https://github.com/Kapeli/Dash-User-Contributions) for the [Swift language guide](https://docs.swift.org/swift-book/LanguageGuide/). Includes a table of contents.
 
-This script will fetch the documentation from the Swift homepage, prepare it for Dash, and put everything in a `.build` folder in the same directory the script has been executed in.
+Install directly from Dash, or build from source.
 
-## Features
+## Building from Source
 
-- Includes entries for each 'chapter' and its sub-sections.
-- Tables of contents for sub-sections.
-
-## Dependencies
-
-- Python 3.8+. Should be provided by your Mac if you're running Catalina or newer.
-- [html5lib](https://pypi.org/project/html5lib/) (`pip3 install html5lib`)
-- [beautifulsoup4](https://www.crummy.com/software/BeautifulSoup/) (`pip3 install beautifulsoup4`)
-- [wget](https://www.gnu.org/software/wget/) (`brew install wget`)
+1. The only dependency is [wget](https://www.gnu.org/software/wget/) (`brew install wget`). Other utilities used in the script should be available if you’re running a recent version of macOS.
+2. Clone this repo.
+3. Run ./main.sh, the script will fetch the documentation from the Swift homepage, prepare it for Dash.
+4. The ./build folder should now contain the docset bundle, ready to be added to Dash. Additionally, an archived version of the docset (along with the files necessary to distribution) will be produced.
