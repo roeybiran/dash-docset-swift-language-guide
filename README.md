@@ -8,7 +8,8 @@ Install directly from Dash, or build from source.
 
 ## Building from Source
 
-1. The only dependency is [wget](https://www.gnu.org/software/wget/) (`brew install wget`). Other utilities used in the script should be available if you’re running a recent version of macOS.
+1. The only external dependency is [wget](https://www.gnu.org/software/wget/) (`brew install wget`). Other utilities used in the script are already available to you if you’re running a recent version of macOS.
 2. Clone this repo.
-3. Run ./main.sh, the script will fetch the documentation from the Swift homepage, prepare it for Dash.
-4. The ./build folder should now contain the docset bundle, ready to be added to Dash. Additionally, an archived version of the docset (along with the files necessary to distribution) will be produced.
+3. `cd` to the project's root and run `./main.sh`. The script will fetch the documentation from the [Swift language guide’s](https://docs.swift.org/swift-book/LanguageGuide/) homepage, and prepare it for Dash.
+4. Inside ./.build you'll find the docset bundle, ready to be added to Dash.
+5. Plus, ./.dist will now contain what’s needed to publish the docset to Dash — the compressed docset bundle along with some required assets.

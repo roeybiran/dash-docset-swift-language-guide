@@ -2,7 +2,7 @@
 
 set -o nounset
 
-if ! command -v wget; then
+if ! command -v wget &>/dev/null; then
 	echo wget is not installed.
 	exit
 fi
@@ -16,6 +16,7 @@ fi
 PLB=/usr/libexec/PlistBuddy
 
 BUILD_DIR="./.build"
+DIST_DIR="./.dist"
 CACHE_DIR="./.cache"
 ASSETS_DIR="./assets"
 README="./README.md"
@@ -35,16 +36,16 @@ DOCSET_PLIST_PATH="$BUNDLE_PATH/Contents/Info.plist"
 DOCSET_DB_PATH="$BUNDLE_PATH/Contents/Resources/docSet.dsidx"
 HTML_PATH="$BUNDLE_PATH/Contents/Resources/Documents"
 
-JSON_PATH="$BUILD_DIR/docset.json"
-TAR_PATH="$BUILD_DIR/$DOCSET_NAME.tgz"
 ICON="$ASSETS_DIR/icon.png"
 ICON2X="$ASSETS_DIR/icon@2x.png"
+JSON_PATH="$DIST_DIR/docset.json"
+TAR_PATH="$DIST_DIR/$DOCSET_NAME.tgz"
 
-rm -rf "$BUILD_DIR"
+rm -rf "$BUILD_DIR" "$DIST_DIR"
 
 sleep 0.5
 
-mkdir -p "$HTML_PATH" 2>/dev/null
+mkdir -p "$HTML_PATH" "$BUILD_DIR" "$DIST_DIR" 2>/dev/null
 
 # plist
 for entry in \
@@ -137,8 +138,8 @@ done
 plutil -convert json "$JSON_PATH"
 
 # README
-cp "$README" "$BUILD_DIR"
+cp "$README" "$DIST_DIR"
 
 # icons
-cp "$ICON" "$BUILD_DIR"
-cp "$ICON2X" "$BUILD_DIR"
+cp "$ICON" "$DIST_DIR"
+cp "$ICON2X" "$DIST_DIR"
