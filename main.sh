@@ -11,46 +11,48 @@ fi
 # https://github.com/Kapeli/Dash-User-Contributions/wiki/Docset-Contribution-Checklist
 # https://github.com/Kapeli/Dash-User-Contributions#contribute-a-new-docset
 
-# define constants
+# constants, configure as necessary
+ARCHIVE_NAME="SwiftLanguageGuide"
+DOCSET_NAME="Swift Language Guide"
+DOCSET_VERSION="5.5"
+KEYWORDS='"Swift", "Swift Language Guide", "Swift Book"'
+AUTHOR="Roey Biran"
+AUTHOR_URL="https://github.com/roeybiran"
+FALLBACK_URL="https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
+DOCSET_BUNDLE_ID="com.roeybiran.dashdocset.$ARCHIVE_NAME"
+PLATFORM_FAMILY="Swift"
+INDEX_FILE_PATH="docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
+DOCS_FETCH_URL="https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
+# end constants
+
+BUILD_PATH="./.build"
+DIST_PATH="./.dist"
+CACHE_PATH="./.cache"
+ASSETS_PATH="./assets"
+README="./README.md"
+ARCHIVE_BASENAME="$ARCHIVE_NAME.tgz"
+BUNDLE_BASENAME="$ARCHIVE_NAME.docset"
+BUNDLE_PATH="$BUILD_PATH/$BUNDLE_BASENAME"
+DOCSET_DB_PATH="$BUNDLE_PATH/Contents/Resources/docSet.dsidx"
+DOCSET_PLIST_PATH="$BUNDLE_PATH/Contents/Info.plist"
+HTML_PATH="$BUNDLE_PATH/Contents/Resources/Documents"
+ICON="$ASSETS_PATH/icon.png"
+ICON2X="$ASSETS_PATH/icon@2x.png"
+JSON_PATH="$DIST_PATH/docset.json"
+TAR_PATH="$DIST_PATH/$ARCHIVE_BASENAME"
 
 PLB=/usr/libexec/PlistBuddy
 
-BUILD_DIR="./.build"
-DIST_DIR="./.dist"
-CACHE_DIR="./.cache"
-ASSETS_DIR="./assets"
-README="./README.md"
-
-KEYWORDS=("Swift" "Swift Language Guide" "Swift Book")
-AUTHOR="Roey Biran"
-AUTHOR_URL="https://github.com/roeybiran"
-DOCS_URL="https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
-DOCSET_NAME="Swift Language Guide"
-DOCSET_BUNDLE_ID="com.roeybiran.dashdocset.SwiftLanguageGuide"
-FALLBACK_URL="https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
-PLATFORM_FAMILY="Swift"
-INDEX_FILE_PATH="docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
-
-BUNDLE_PATH="$BUILD_DIR/$DOCSET_NAME.docset"
-DOCSET_PLIST_PATH="$BUNDLE_PATH/Contents/Info.plist"
-DOCSET_DB_PATH="$BUNDLE_PATH/Contents/Resources/docSet.dsidx"
-HTML_PATH="$BUNDLE_PATH/Contents/Resources/Documents"
-
-ICON="$ASSETS_DIR/icon.png"
-ICON2X="$ASSETS_DIR/icon@2x.png"
-JSON_PATH="$DIST_DIR/docset.json"
-TAR_PATH="$DIST_DIR/$DOCSET_NAME.tgz"
-
-rm -rf "$BUILD_DIR" "$DIST_DIR"
+rm -rf "${BUILD_PATH:?}"/* "${DIST_PATH:?}"/*
 
 sleep 0.5
 
-mkdir -p "$HTML_PATH" "$BUILD_DIR" "$DIST_DIR" 2>/dev/null
+mkdir -p "$HTML_PATH" "$BUILD_PATH" "$DIST_PATH" 2>/dev/null
 
 # plist
 for entry in \
 	"Add :CFBundleIdentifier string $DOCSET_BUNDLE_ID" \
-	"Add :CFBundleName string $DOCSET_NAME" \
+	"Add :CFBundleName string $ARCHIVE_NAME" \
 	"Add :DocSetPlatformFamily string $PLATFORM_FAMILY" \
 	"Add :isDashDocset bool true" \
 	"Add :dashIndexFilePath string $INDEX_FILE_PATH" \
@@ -61,14 +63,14 @@ for entry in \
 done
 
 # fetch docs
-if ! test -d "$CACHE_DIR"; then
+if ! test -d "$CACHE_PATH"; then
 	wget \
 		--show-progress \
 		--recursive \
 		--page-requisites \
 		--no-parent \
-		--directory-prefix "$CACHE_DIR" \
-		"$DOCS_URL"
+		--directory-prefix "$CACHE_PATH" \
+		"$DOCS_FETCH_URL"
 fi
 
 # make db
@@ -78,7 +80,7 @@ sqlite3 "$DOCSET_DB_PATH" <<-EOF
 EOF
 
 # copy html
-cp -R "$CACHE_DIR"/* "$HTML_PATH"
+cp -R "$CACHE_PATH"/* "$HTML_PATH"
 
 # iterate html files and populate the index
 while IFS=$'\n' read -r FILE; do
@@ -118,28 +120,27 @@ while IFS=$'\n' read -r FILE; do
 done < <(find "$HTML_PATH" -name "*.html")
 
 # tar
-tar --exclude=".DS_Store" -cvzf "$TAR_PATH" "$BUNDLE_PATH" &>/dev/null
+tar --exclude=".DS_Store" -cvzf "$TAR_PATH" -C "$BUILD_PATH" "$BUNDLE_BASENAME" &>/dev/null
 
 # json
-for stmt in \
-	"Add :name string $DOCSET_NAME" \
-	"Add :version string 5.4" \
-	"Add :archive string $DOCSET_NAME.tgz" \
-	"Add :author dict" \
-	"Add :author:name string $AUTHOR" \
-	"Add :author:link string $AUTHOR_URL" \
-	"Add :aliases array"; do
-	$PLB -c "$stmt" "$JSON_PATH" 1>/dev/null
-done
+json="
+{
+	\"name\": \"$DOCSET_NAME\",
+	\"version\": \"$DOCSET_VERSION\",
+	\"archive\": \"$ARCHIVE_BASENAME\",
+	\"author\": {
+		\"name\": \"$AUTHOR\",
+		\"link\": \"$AUTHOR_URL\"
+	},
+	\"aliases\": [$KEYWORDS],
+	\"specific_versions\": []
+}"
 
-for ((i = 0; i < "${#KEYWORDS[@]}"; i++)); do
-	$PLB -c "Add :aliases:$i string ${KEYWORDS[$i]}" "$JSON_PATH" 1>/dev/null
-done
-plutil -convert json "$JSON_PATH"
+printf "%s\n" "$json" >"$JSON_PATH"
 
 # README
-cp "$README" "$DIST_DIR"
+cp "$README" "$DIST_PATH"
 
 # icons
-cp "$ICON" "$DIST_DIR"
-cp "$ICON2X" "$DIST_DIR"
+cp "$ICON" "$DIST_PATH"
+cp "$ICON2X" "$DIST_PATH"
