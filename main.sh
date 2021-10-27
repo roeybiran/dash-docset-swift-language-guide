@@ -11,7 +11,8 @@ fi
 # https://github.com/Kapeli/Dash-User-Contributions/wiki/Docset-Contribution-Checklist
 # https://github.com/Kapeli/Dash-User-Contributions#contribute-a-new-docset
 
-# constants, configure as necessary
+# BEGIN CONSTANTS
+# configure as necessary
 ARCHIVE_NAME="SwiftLanguageGuide"
 DOCSET_NAME="Swift Language Guide"
 DOCSET_VERSION="5.5"
@@ -23,7 +24,7 @@ DOCSET_BUNDLE_ID="com.roeybiran.dashdocset.$ARCHIVE_NAME"
 PLATFORM_FAMILY="Swift"
 INDEX_FILE_PATH="docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
 DOCS_FETCH_URL="https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
-# end constants
+# END CONSTANTS
 
 BUILD_PATH="./.build"
 DIST_PATH="./.dist"
@@ -52,7 +53,7 @@ mkdir -p "$HTML_PATH" "$BUILD_PATH" "$DIST_PATH" 2>/dev/null
 # plist
 for entry in \
 	"Add :CFBundleIdentifier string $DOCSET_BUNDLE_ID" \
-	"Add :CFBundleName string $ARCHIVE_NAME" \
+	"Add :CFBundleName string $DOCSET_NAME" \
 	"Add :DocSetPlatformFamily string $PLATFORM_FAMILY" \
 	"Add :isDashDocset bool true" \
 	"Add :dashIndexFilePath string $INDEX_FILE_PATH" \
