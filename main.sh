@@ -15,7 +15,7 @@ fi
 # configure as necessary
 ARCHIVE_NAME="SwiftLanguageGuide"
 DOCSET_NAME="Swift Language Guide"
-DOCSET_VERSION="5.5"
+DOCSET_VERSION="5.6"
 KEYWORDS='"Swift", "Swift Language Guide", "Swift Book"'
 AUTHOR="Roey Biran"
 AUTHOR_URL="https://github.com/roeybiran"
@@ -63,6 +63,10 @@ for entry in \
 	$PLB -c "$entry" "$DOCSET_PLIST_PATH" 1>/dev/null
 done
 
+if [ "${1:-""}" = '--refetch' ]; then
+	rm -rf "$CACHE_PATH"
+fi
+
 # fetch docs
 if ! test -d "$CACHE_PATH"; then
 	wget \
@@ -71,6 +75,7 @@ if ! test -d "$CACHE_PATH"; then
 		--page-requisites \
 		--no-parent \
 		--directory-prefix "$CACHE_PATH" \
+		--compression=gzip \
 		"$DOCS_FETCH_URL"
 fi
 
