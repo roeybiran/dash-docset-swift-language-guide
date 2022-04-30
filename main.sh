@@ -13,9 +13,9 @@ fi
 
 # BEGIN CONSTANTS
 # configure as necessary
+DOCSET_VERSION="5.6" # swift version
 ARCHIVE_NAME="SwiftLanguageGuide"
 DOCSET_NAME="Swift Language Guide"
-DOCSET_VERSION="5.6"
 KEYWORDS='"Swift", "Swift Language Guide", "Swift Book"'
 AUTHOR="Roey Biran"
 AUTHOR_URL="https://github.com/roeybiran"
@@ -23,7 +23,7 @@ FALLBACK_URL="https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
 DOCSET_BUNDLE_ID="com.roeybiran.dashdocset.$ARCHIVE_NAME"
 PLATFORM_FAMILY="Swift"
 INDEX_FILE_PATH="docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
-DOCS_FETCH_URL="https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
+DOCS_FETCH_URL="https://docs.swift.org/swift-book/"
 # END CONSTANTS
 
 BUILD_PATH="./.build"
@@ -101,6 +101,7 @@ while IFS=$'\n' read -r FILE; do
 
 	while IFS=$'\n' read -r SECTION; do
 		dash_name="${SECTION:4}"
+		# TODO: percent escape
 		dash_name="${dash_name//<*/}"
 
 		# https://kapeli.com/docsets#supportedentrytypes
