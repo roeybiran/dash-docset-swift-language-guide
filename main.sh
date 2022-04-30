@@ -19,10 +19,10 @@ DOCSET_NAME="Swift Language Guide"
 KEYWORDS='"Swift", "Swift Language Guide", "Swift Book"'
 AUTHOR="Roey Biran"
 AUTHOR_URL="https://github.com/roeybiran"
-FALLBACK_URL="https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
+FALLBACK_URL="https://"
 DOCSET_BUNDLE_ID="com.roeybiran.dashdocset.$ARCHIVE_NAME"
 PLATFORM_FAMILY="Swift"
-INDEX_FILE_PATH="docs.swift.org/swift-book/LanguageGuide/TheBasics.html"
+INDEX_FILE_PATH="docs.swift.org/swift-book/index.html"
 DOCS_FETCH_URL="https://docs.swift.org/swift-book/"
 # END CONSTANTS
 
