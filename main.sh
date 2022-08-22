@@ -11,9 +11,8 @@ fi
 # https://github.com/Kapeli/Dash-User-Contributions/wiki/Docset-Contribution-Checklist
 # https://github.com/Kapeli/Dash-User-Contributions#contribute-a-new-docset
 
-# BEGIN CONSTANTS
-# configure as necessary
-DOCSET_VERSION="5.6" # swift version
+# BEGIN CONSTANTS (configure as necessary)
+DOCSET_VERSION="5.7" # swift version
 ARCHIVE_NAME="SwiftLanguageGuide"
 DOCSET_NAME="Swift Language Guide"
 KEYWORDS='"Swift", "Swift Language Guide", "Swift Book"'
