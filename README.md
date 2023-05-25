@@ -1,5 +1,7 @@
 # dash-docset-swift-language-guide
 
+TODO: use https://github.com/apple/swift-book
+
 A shell script to generate a [Dash docset](https://github.com/Kapeli/Dash-User-Contributions) for the [Swift language guide](https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html). Includes a table of contents.
 
 ## Get Started
